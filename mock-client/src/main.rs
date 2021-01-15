@@ -10,7 +10,7 @@
 
 #![warn(rust_2018_idioms)]
 
-use std::env;
+use std::{env};
 
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 // use tokio::net::TcpStream;
@@ -19,6 +19,7 @@ use tokio::sync::mpsc;
 
 use std::net::SocketAddr;
 use std::io;
+use std::collections::HashMap;
 use std::error::Error;
 use std::time::{Duration, Instant};
 
@@ -35,10 +36,84 @@ Usage:
     print!("{}", opts.usage(&brief));
 }
 
-// #[derive(Debug)]
+#[derive(Debug)]
 struct Count {
-    inb: u64,
-    outb: u64,
+    send: u64,
+    recv: u64,
+    send_bytes: u64,
+    recv_bytes: u64,
+}
+
+
+impl Default for Count {
+    fn default () -> Count {
+        Count {
+            send: 0,
+            recv: 0,
+            send_bytes:0,
+            recv_bytes: 0
+        }
+    }
+}
+
+#[derive(Debug)]
+struct RTT {
+    write: Duration,
+    read: Duration,
+    interval: Duration,
+}
+
+impl RTT {
+    fn sort_write(&self) -> Duration {
+        self.write
+    }
+    fn sort_read(&self) -> Duration {
+        self.read
+    }
+    fn sort_interval(&self) -> Duration {
+        self.write
+    }
+}
+
+impl Default for RTT {
+    fn default () -> RTT {
+        RTT {
+            write: Duration::default(),
+            read: Duration::default(),
+            interval: Duration::default(),
+        }
+    }
+}
+
+// Return RTT with all fields of specified percentile
+fn percentile(n: usize, latency: &mut Vec<RTT>) -> RTT {
+    if n > 100 {
+        println!("Cannot calculate {}-percentile", n);
+        RTT::default();
+    }
+    let mut res = RTT::default();
+    let s = latency.len();
+    let ind = s * n / 100;
+    // A more efficient way needed, may be decouple all latency
+    // fields in different data structures
+    latency.sort_by_key(|k| k.sort_write());
+    res.write = latency[ind].write;
+    latency.sort_by_key(|k| k.sort_read());
+    res.read = latency[ind].read;
+    latency.sort_by_key(|k| k.sort_interval());
+    res.interval = latency[ind].interval;
+
+    res
+}
+
+//  Return RTT with all fields of average
+fn average(latency: &mut Vec<RTT>) -> Duration {
+    let s = latency.len();
+    let mut sum = Duration::default();
+    for rtt in latency {
+        sum += rtt.write + rtt.read + rtt.interval;
+    }
+    Duration::from_secs_f64(sum.as_secs_f64() / s as f64)
 }
 
 #[tokio::main]
@@ -84,7 +159,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     if matches.opt_present("h") {
         print_usage(&program, &opts);
-        return Ok(());
+        return Ok(())
     }
 
     let length = matches
@@ -116,35 +191,56 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let totltime = Duration::from_secs(duration);
     let (tx, mut rx) = mpsc::channel(32);
+    let (ltx, mut lrx) = mpsc::channel(4096);
+
+    println!("Benchmarking:");
+    println!(
+        "{} streams will send {}-byte packets to {} for {} sec.",
+        number, length, address, duration
+    );
 
     for i in 0..number {
         // created for each tasks
         let tx = tx.clone();
+        let ltx = ltx.clone();
         let address = address.clone();
         let length = length;
 
         tokio::spawn(async move {
-            let mut sum = Count { inb: 0, outb: 0 };
+            let mut sum = Count::default();
             let out_buf: Vec<u8> = vec![0; 4096];
             let mut in_buf: Vec<u8> = vec![0; 4096];
+            let mut latency: Vec<RTT> = Vec::new();
 
             // Open a TCP stream to the socket address.
             let socket = TcpSocket::new_v4().unwrap();
             let mut stream = socket.connect(address).await.unwrap();
-            // println!("created stream-{}", i);
 
             let start = Instant::now();
             loop {
+                let mut rtt = RTT::default();
+                let mut last_t = Instant::now();
                 match stream.write_all(&out_buf[0..length]).await {
+                    Ok(_) => {
+                        sum.send += 1;
+                        sum.send_bytes += length as u64;
+                        rtt.write = last_t.elapsed();
+                        last_t = Instant::now();
+                    }
                     Err(_) => {
                         println!("Write error!");
                         break;
                     }
-                    Ok(_) => sum.outb += 1,
                 };
 
+                rtt.interval = last_t.elapsed();
+                last_t = Instant::now();
                 match stream.read(&mut in_buf).await {
-                    Ok(_) => sum.inb += 1,
+                    Ok(n) => {
+                        sum.recv += 1;
+                        sum.recv_bytes += n as u64;
+                        rtt.read = last_t.elapsed();
+                    }
                     Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
                         continue;
                     }
@@ -153,45 +249,85 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         break;
                     }
                 };
+                latency.push(rtt);
                 let elapsed = start.elapsed();
                 if elapsed > totltime {
                     // println!("Done benchamarking for task-{}", i);
                     break;
                 }
             }
-            match tx.send(sum).await {
+            // send packet data back
+            tx.send(sum).await.expect("Send network statistics failed.");
+            match ltx.send(latency).await {
                 Ok(_) => true,
                 Err(_) => {
-                    println!("Send sum from {}-task failed", i);
+                    println!("Send latency metrics from {}-task failed", i);
                     false
-                }
+                }         
             }
             // Ok(())
         });
     }
 
-    let mut sum = Count { inb: 0, outb: 0 };
-    for _ in 0..number {
+
+    let mut sum = Count::default();
+    let mut metrics = HashMap::new();
+    for i in 0..number {
         let c = match rx.recv().await {
             Some(c) => c,
-            None => Count { inb: 0, outb: 0 },
+            None => Count::default(),
         };
-        sum.inb += c.inb;
-        sum.outb += c.outb;
+        sum.recv += c.recv;
+        sum.recv_bytes += c.recv_bytes;
+        sum.send += c.send;
+        sum.send_bytes += c.send_bytes;
+
+        let latency = lrx.recv().await.unwrap();
+        metrics.insert(i, latency);
+    }
+    
+    let qps = sum.send as f64 / duration as f64 / 1000.0;
+    let rps = sum.recv as f64 / duration as f64 / 1000.0;
+    if qps == rps {
+        println!();
+        println!("The actual QPS is {:.1}K", rps);
+    } else {
+        println!("Requests {:.1} / Responses {:.1} mismatch", qps, rps);
+        return Ok(())
     }
 
-    println!("Benchmarking: {}", address);
-    println!(
-        "{} streams, running {} bytes for {} sec.",
-        number, length, duration
-    );
     println!();
-    println!("Requests: {} Responses: {}", sum.outb, sum.inb);
+
+    let pts = vec![10, 50, 95, 99];
+
+    let mut ic = 0;
+    for (i, mut latency) in metrics {
+        if ic >= 10 {
+            break;
+        } else {
+            ic += 1;
+        }
+
+        println!("Stream-{}:", i);
+        for pt in &pts {
+            let res = percentile(*pt, &mut latency);
+            print!("| {}th-{:?} |", pt, res);
+        }
+        println!();
+        let avg = average(&mut latency);
+        println!("Average: {:?}", avg);
+        println!();
+    }
+    println!();
     println!(
-        "Speed: {} requests/sec, {} Mbps, {} responses/sec",
-        sum.outb / duration,
-        sum.outb / duration * (length as u64) / 1024 / 128,
-        sum.inb / duration
+        "Send: {} bytes / {} Mbps",
+        sum.send_bytes,
+        sum.send_bytes / duration / 1024 / 128
+    );
+    println!(
+        "Recv: {} bytes / {} Mbps",
+        sum.recv_bytes,
+        sum.recv_bytes / duration / 1024 / 128
     );
     Ok(())
 }

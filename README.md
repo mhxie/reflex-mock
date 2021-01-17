@@ -2,6 +2,9 @@
 
 ReFlex-Mock is consist of server and client mock implementations for benchmarking various workloads.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/mhxie/reflex-mock/blob/main/LICENSE)
+[![Rust](https://github.com/mhxie/reflex-mock/workflows/CI/badge.svg)](https://github.com/mhxie/reflex-mock/actions?query=workflow%3ACI)
+
 ## Build
 
     cargo build

@@ -1,6 +1,6 @@
-# serverless AWS Rust template
+# Serverless ReFlex Client
 
-A sample template for bootstrapping [Rustlang AWS Lambda](https://github.com/awslabs/aws-lambda-rust-runtime/) applications with ⚡ serverless framework ⚡.
+A serverless client for bootstrapping [Rustlang AWS Lambda](https://github.com/awslabs/aws-lambda-rust-runtime/) applications with ⚡ serverless framework ⚡.
 
 ## ✨ features
 

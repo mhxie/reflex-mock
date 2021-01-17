@@ -10,7 +10,7 @@
 #    docs.serverless.com
 #
 # Happy Coding!
-service: serverless-echo
+service: serverless-client
 provider:
   name: aws
   runtime: rust

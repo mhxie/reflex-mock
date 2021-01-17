@@ -1,6 +1,7 @@
 [package]
-name = "hello"
+name = "serverless-client"
 version = "0.1.0"
+authors = ["Minghao Xie <mhxie@ucsc.edu>"]
 edition = "2018"
 
 [dependencies]

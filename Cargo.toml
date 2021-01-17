@@ -3,4 +3,5 @@
 members = [
     "mock-server",
     "mock-client",
+    "serverless-client",
 ]

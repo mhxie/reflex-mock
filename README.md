@@ -3,7 +3,8 @@
 ReFlex-Mock is consist of server and client mock implementations for benchmarking various workloads.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/mhxie/reflex-mock/blob/main/LICENSE)
-[![Rust](https://github.com/mhxie/reflex-mock/workflows/CI/badge.svg)](https://github.com/mhxie/reflex-mock/actions?query=workflow%3ACI)
+[![Build Status](https://github.com/mhxie/reflex-mock/workflows/CI/badge.svg)](https://github.com/mhxie/reflex-mock/actions?query=workflow%3ACI)
+[![Deploy Status](https://github.com/mhxie/reflex-mock/workflows/CD/badge.svg)](https://github.com/mhxie/reflex-mock/actions?query=workflow%3ACD)
 
 ## Build
 
@@ -26,9 +27,9 @@ ReFlex-Mock is consist of server and client mock implementations for benchmarkin
     pip3 install awscli --upgrade --user
     aws configure
 
-    # Try the serverlessdemo with the plugin serverless-rust
+    # Try the serverless demo with the plugin serverless-rust
     docker pull softprops/lambda-rust:0.2.7-rust-1.43.1
-    cd serverless-echo && npm ci
+    cd serverless-client && npm ci
     npx serverless deploy
 
     # Test your invocation and have fun

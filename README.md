@@ -33,7 +33,12 @@ ReFlex-Mock is consist of server and client mock implementations for benchmarkin
     npx serverless deploy
 
     # Test your invocation and have fun
-    npx serverless invoke -f hello -d '{"foo":"bar"}'
+    npx serverless invoke -f hello -d '{
+        "address":"127.0.0.1:25000",
+        "duration":10,
+        "number":1,
+        "length": 1024,
+        "rw_ratio": 100}'
 
 ## References
 

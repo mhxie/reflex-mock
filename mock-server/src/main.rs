@@ -7,7 +7,6 @@
 //! processed concurrently with all other TCP connections across multiple
 //! threads.
 
-
 #![warn(rust_2018_idioms)]
 
 use tokio::io::{AsyncReadExt, AsyncWriteExt};

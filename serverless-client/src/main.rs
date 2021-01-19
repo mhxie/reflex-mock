@@ -1,5 +1,5 @@
 use lambda::{handler_fn, Context};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 // use std::net::SocketAddr;
 use tokio::io::AsyncWriteExt;
@@ -15,7 +15,7 @@ async fn main() -> Result<(), Error> {
     Ok(())
 }
 
-async fn hello_ec2(addr: &String) -> Result<(),  Error> {
+async fn hello_ec2(addr: &str) -> Result<(), Error> {
     let mut stream = TcpStream::connect(addr).await?;
     // let mut stream = TcpStream::connect_timeout(addr, Duration::from_secs(1)).await?;
     println!("created stream");

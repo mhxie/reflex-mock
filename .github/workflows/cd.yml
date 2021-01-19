@@ -1,17 +1,37 @@
 name: CD
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    branches: [main, dev]
-    types: 
-      - completed
-      - requested
+  # workflow_run:
+  #   workflows: ["CI"]
+  #   branches:
+  #     - main
+  #     - dev
+  #   types: 
+  #     - completed
+  #     - requested
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  test:
+    # needs: [codestyle, lint, compile]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup Rust
+      uses: hecrj/setup-rust-action@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Test
+      run: cargo test
+
   deploy:
     # if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest

@@ -53,6 +53,11 @@ provider:
 
 package:
   individually: true
+  exclude:
+    -./**
+  include:
+    -serverless-client/**
+    -mock/**
 
 plugins:
   - serverless-rust

@@ -55,4 +55,4 @@ jobs:
         run: |
           npm install
           npx serverless deploy --conceal
-        working-directory: serverless-client
+        # working-directory: serverless-client

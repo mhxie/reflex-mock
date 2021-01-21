@@ -5,8 +5,8 @@ authors = ["Minghao Xie <mhxie@ucsc.edu>"]
 edition = "2018"
 
 [dependencies]
-tokio = { version = "0.2", features = ["macros"] }
-lambda = { git = "https://github.com/awslabs/aws-lambda-rust-runtime/", branch = "master"}
+tokio = { version = "1.0.1", features = ["full"] }
+netlify_lambda = { package = "netlify_lambda", version = "0.2.0" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 

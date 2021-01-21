@@ -1,6 +1,6 @@
 # ReFlex-Mock
 
-ReFlex-Mock is consist of server and client mock implementations for benchmarking various workloads.
+ReFlex-Mock is consist of server and client mock implementations for benchmarking various workloads on disaggregated storage - ReFlex(https://github.com/stanford-mast/reflex) .
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/mhxie/reflex-mock/blob/main/LICENSE)
 [![Build Status](https://github.com/mhxie/reflex-mock/workflows/CI/badge.svg)](https://github.com/mhxie/reflex-mock/actions?query=workflow%3ACI)
@@ -12,7 +12,7 @@ ReFlex-Mock is consist of server and client mock implementations for benchmarkin
 
 ## Run Mock Server
 
-    cargo run --release -p mock-server
+    cargo run --release -p mock-server -- "127.0.0.1:25000"
 
 ## Run Mock Client
 
@@ -29,7 +29,7 @@ ReFlex-Mock is consist of server and client mock implementations for benchmarkin
 
     # Try the serverless demo with the plugin serverless-rust
     docker pull softprops/lambda-rust:0.2.7-rust-1.43.1
-    cd serverless-client && npm ci
+    npm ci
     npx serverless deploy
 
     # Test your invocation and have fun
@@ -44,4 +44,5 @@ ReFlex-Mock is consist of server and client mock implementations for benchmarkin
 
 * https://github.com/haraldh/rust_echo_bench
 * https://github.com/tokio-rs/tokio
+* https://github.com/awslabs/aws-lambda-rust-runtime
 * https://www.serverless.com/plugins/serverless-rust

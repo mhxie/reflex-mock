@@ -1,5 +1,5 @@
 [package]
-name = "mock-server"
+name = "mock"
 version = "0.1.0"
 authors = ["Minghao Xie <mhxie@ucsc.edu>"]
 edition = "2018"
@@ -8,4 +8,3 @@ edition = "2018"
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
-mock = { path = "../mock" }

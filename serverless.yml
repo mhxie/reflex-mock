@@ -54,10 +54,11 @@ provider:
 package:
   individually: true
   exclude:
-    -./**
-  include:
-    -serverless-client/**
-    -mock/**
+    # -./**
+    -mock-client/**
+  # include:
+  #   -serverless-client/**
+  #   -mock/**
 
 plugins:
   - serverless-rust
@@ -112,3 +113,13 @@ functions:
 #     NewOutput:
 #       Description: "Description for the output"
 #       Value: "Some output value"
+custom:
+  # this section customizes of the default
+  # serverless-rust plugin settings
+  rust:
+    # flags passed to cargo
+    # cargoFlags: '--features enable-awesome'
+    # custom docker tag
+    dockerTag: '0.3.0-rust-1.45.0'
+    #  custom docker image
+    dockerImage: 'softprops/lambda-rust'

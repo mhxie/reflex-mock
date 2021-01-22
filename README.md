@@ -5,6 +5,7 @@ ReFlex-Mock is consist of server and client mock implementations for benchmarkin
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/mhxie/reflex-mock/blob/main/LICENSE)
 [![Build Status](https://github.com/mhxie/reflex-mock/workflows/CI/badge.svg)](https://github.com/mhxie/reflex-mock/actions?query=workflow%3ACI)
 [![Deploy Status](https://github.com/mhxie/reflex-mock/workflows/CD/badge.svg)](https://github.com/mhxie/reflex-mock/actions?query=workflow%3ACD)
+[![code-size](https://img.shields.io/github/languages/code-size/mhxie/reflex-mock)](https://github.com/mhxie/reflex-mock)
 
 ## Build
 
@@ -34,7 +35,7 @@ ReFlex-Mock is consist of server and client mock implementations for benchmarkin
 
     # Test your invocation and have fun
     npx serverless invoke -f rust-cli -d '{
-        "addr":"10.0.1.62:25000",
+        "addr":"10.0.1.211:25000",
         "duration":10,
         "number":1,
         "length": 1024,

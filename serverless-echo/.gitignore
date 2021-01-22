@@ -1,6 +1,0 @@
-node_modules
-.serverless
-target
-Cargo.lock
-package-lock.json
-package.json

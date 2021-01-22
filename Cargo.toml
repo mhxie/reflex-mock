@@ -1,6 +1,8 @@
 [workspace]
 
 members = [
+    "mock",
     "mock-server",
     "mock-client",
+    "serverless-client",
 ]

@@ -10,17 +10,17 @@
 
 #![warn(rust_2018_idioms)]
 
-use std::{env};
+use std::env;
 
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 // use tokio::net::TcpStream;
-use tokio::net::{TcpSocket};
+use tokio::net::TcpSocket;
 use tokio::sync::mpsc;
 
-use std::net::SocketAddr;
-use std::io;
 use std::collections::HashMap;
 use std::error::Error;
+use std::io;
+use std::net::SocketAddr;
 use std::time::{Duration, Instant};
 
 fn print_usage(program: &str, opts: &getopts::Options) {
@@ -44,14 +44,13 @@ struct Count {
     recv_bytes: u64,
 }
 
-
 impl Default for Count {
-    fn default () -> Count {
+    fn default() -> Count {
         Count {
             send: 0,
             recv: 0,
-            send_bytes:0,
-            recv_bytes: 0
+            send_bytes: 0,
+            recv_bytes: 0,
         }
     }
 }
@@ -76,7 +75,7 @@ impl RTT {
 }
 
 impl Default for RTT {
-    fn default () -> RTT {
+    fn default() -> RTT {
         RTT {
             write: Duration::default(),
             read: Duration::default(),
@@ -159,7 +158,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     if matches.opt_present("h") {
         print_usage(&program, &opts);
-        return Ok(())
+        return Ok(());
     }
 
     let length = matches
@@ -203,7 +202,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         // created for each tasks
         let tx = tx.clone();
         let ltx = ltx.clone();
-        let address = address.clone();
+        // let address = address.clone();
         let length = length;
 
         tokio::spawn(async move {
@@ -263,12 +262,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 Err(_) => {
                     println!("Send latency metrics from {}-task failed", i);
                     false
-                }         
+                }
             }
             // Ok(())
         });
     }
-
 
     let mut sum = Count::default();
     let mut metrics = HashMap::new();
@@ -285,15 +283,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let latency = lrx.recv().await.unwrap();
         metrics.insert(i, latency);
     }
-    
+
     let qps = sum.send as f64 / duration as f64 / 1000.0;
     let rps = sum.recv as f64 / duration as f64 / 1000.0;
-    if qps == rps {
+    if (qps - rps).abs() < 0.0001 {
         println!();
         println!("The actual QPS is {:.1}K", rps);
     } else {
         println!("Requests {:.1} / Responses {:.1} mismatch", qps, rps);
-        return Ok(())
+        return Ok(());
     }
 
     println!();

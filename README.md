@@ -1,9 +1,10 @@
 # ReFlex-Mock
 
-ReFlex-Mock is consist of server and client mock implementations for benchmarking various workloads.
+ReFlex-Mock is consist of server and client mock implementations for benchmarking various workloads on disaggregated storage - [ReFlex](https://github.com/stanford-mast/reflex) .
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/mhxie/reflex-mock/blob/main/LICENSE)
-[![Rust](https://github.com/mhxie/reflex-mock/workflows/CI/badge.svg)](https://github.com/mhxie/reflex-mock/actions?query=workflow%3ACI)
+[![Build Status](https://github.com/mhxie/reflex-mock/workflows/CI/badge.svg)](https://github.com/mhxie/reflex-mock/actions?query=workflow%3ACI)
+[![Deploy Status](https://github.com/mhxie/reflex-mock/workflows/CD/badge.svg)](https://github.com/mhxie/reflex-mock/actions?query=workflow%3ACD)
 
 ## Build
 
@@ -11,7 +12,7 @@ ReFlex-Mock is consist of server and client mock implementations for benchmarkin
 
 ## Run Mock Server
 
-    cargo run --release -p mock-server
+    cargo run --release -p mock-server -- "127.0.0.1:25000"
 
 ## Run Mock Client
 
@@ -26,16 +27,22 @@ ReFlex-Mock is consist of server and client mock implementations for benchmarkin
     pip3 install awscli --upgrade --user
     aws configure
 
-    # Try the serverlessdemo with the plugin serverless-rust
-    docker pull softprops/lambda-rust:0.2.7-rust-1.43.1
-    cd serverless-echo && npm ci
+    # Try the serverless demo with the plugin serverless-rust
+    docker pull softprops/lambda-rust:latest # 0.3.0-rust-1.45.0
+    npm ci
     npx serverless deploy
 
     # Test your invocation and have fun
-    npx serverless invoke -f hello -d '{"foo":"bar"}'
+    npx serverless invoke -f rust-cli -d '{
+        "addr":"10.0.1.62:25000",
+        "duration":10,
+        "number":1,
+        "length": 1024,
+        "rw_ratio": 100}'
 
 ## References
 
 * https://github.com/haraldh/rust_echo_bench
 * https://github.com/tokio-rs/tokio
+* https://github.com/awslabs/aws-lambda-rust-runtime
 * https://www.serverless.com/plugins/serverless-rust

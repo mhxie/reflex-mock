@@ -9,3 +9,5 @@ edition = "2018"
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 getopts = "0"
+
+mock = { path = "../mock" }

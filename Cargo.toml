@@ -2,6 +2,7 @@
 
 members = [
     "mock",
+    "stat",
     "mock-server",
     "mock-client",
     "serverless-client",

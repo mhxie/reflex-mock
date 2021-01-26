@@ -35,7 +35,7 @@ ReFlex-Mock is consist of server and client mock implementations for benchmarkin
 
     # Test your invocation and have fun
     npx serverless invoke -f rust-cli -d '{
-        "addr":"10.0.1.211:25000",
+        "addr":"10.0.1.208:25000",
         "duration":10,
         "number":1,
         "length": 1024,

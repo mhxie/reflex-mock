@@ -10,11 +10,11 @@
 #    docs.serverless.com
 #
 # Happy Coding!
-service: asyncreflex
+service: reflex-mock
 provider:
   name: aws
   runtime: rust
-  memorySize: 128
+  memorySize: 256
 # you can overwrite defaults here
   stage: dev
   region: us-west-2
